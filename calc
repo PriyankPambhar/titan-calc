@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Titan Fusion - Price & Estimate Calculator</title>
+    <!-- Apple Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Titan Pricing">
+    
+    <!-- Dynamic TF Home Screen Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23080808'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' fill='%23f5f5f7' font-family='-apple-system, sans-serif' font-weight='bold' font-size='72'>TF</text></svg>">
+    
+    <style>
+        :root {
+            --bg-color: #080808;
+            --card-bg: #141414;
+            --card-border: #262626;
+            --text-main: #f5f5f7;
+            --text-muted: #8e8e93;
+            --highlight: #d4d4d8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            padding-top: 24px;
+            padding-bottom: 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group:last-of-type {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="number"], select {
+            padding: 14px 12px;
+            font-size: 18px;
+            font-weight: 500;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            background: #1a1a1a;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+            width: 100%;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--highlight);
+            background: #202020;
+        }
+
+        .btn {
+            width: 100%;
+            background-color: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            opacity: 0.85;
+            transform: scale(0.99);
+        }
+
+        .results-card {
+            display: none;
+            background: linear-gradient(145deg, #141414, #1c1c1c);
+            border: 1px solid var(--card-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--text-main);
+        }
+
+        .results-card.active {
+            display: block;
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .result-item {
+            margin-bottom: 14px;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-top: 2px;
+        }
+
+        .highlight-total {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #555557;
+            margin-top: 24px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Titan Fusion</h1>
+            <p>Pricing & Estimate System</p>
+        </header>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="liveRate">Live Zinc Rate (₹ / kg)</label>
+                <input type="number" id="liveRate" value="460" step="any" inputmode="decimal">
+            </div>
+
+            <div class="input-group">
+                <label for="zincGone">Zinc Consumption (% Gone)</label>
+                <input type="number" id="zincGone" placeholder="e.g. 3" step="any" inputmode="decimal">
+            </div>
+
+            <div class="input-group">
+                <label for="maintenance">Maintenance Charge (₹)</label>
+                <input type="number" id="maintenance" value="8" step="any" inputmode="decimal">
+            </div>
+
+            <div class="input-group">
+                <label for="profitMargin">Profit Margin (%)</label>
+                <input type="number" id="profitMargin" value="35" step="any" inputmode="decimal">
+            </div>
+
+            <button class="btn" onclick="calculateEstimate()">Calculate Price Estimate</button>
+        </div>
+
+        <div class="card results-card" id="resultsCard">
+            <div class="result-item">
+                <div class="result-label">Zinc Cost Portion</div>
+                <div class="result-value" id="zincCostVal">₹0.00</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Base Cost (Zinc + Maintenance)</div>
+                <div class="result-value" id="baseCostVal">₹0.00</div>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--card-border); margin: 14px 0;">
+            <div class="result-item">
+                <div class="result-label">Final Estimated Price</div>
+                <div class="highlight-total" id="finalPriceVal">₹0.00</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            TITAN FUSION CAST & FORGE &copy; 2026
+        </div>
+    </div>
+
+    <script>
+        function calculateEstimate() {
+            let liveRate = parseFloat(document.getElementById('liveRate').value) || 0;
+            let zincGonePercent = parseFloat(document.getElementById('zincGone').value) || 0;
+            let maintenance = parseFloat(document.getElementById('maintenance').value) || 0;
+            let profitPercent = parseFloat(document.getElementById('profitMargin').value) || 0;
+
+            let zincCost = liveRate * (zincGonePercent / 100);
+            let baseCost = zincCost + maintenance;
+            let profitAmount = baseCost * (profitPercent / 100);
+            let finalPrice = baseCost + profitAmount;
+
+            document.getElementById('zincCostVal').innerText = "₹" + zincCost.toFixed(2);
+            document.getElementById('baseCostVal').innerText = "₹" + baseCost.toFixed(2);
+            document.getElementById('finalPriceVal').innerText = "₹" + finalPrice.toFixed(2);
+
+            document.getElementById('resultsCard').classList.add('active');
+        }
+    </script>
+</body>
+</html>
